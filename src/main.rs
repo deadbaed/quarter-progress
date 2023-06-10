@@ -59,7 +59,7 @@ fn QuarterProgress(
             <div class="text-lg">{percentage}" completed"</div>
         </div>
 
-        <div class="space-y-4 text-lg">
+        <div class="space-y-4 text-lg text-justify">
             <div>{current_quarter_name}" started " {quarter_elapsed} " ago"</div>
             <div>"Next quarter starts in "{quarter_remaining}</div>
         </div>
