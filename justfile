@@ -5,4 +5,7 @@ default:
   just --list
 
 dev:
-  trunk serve
+  trunk serve --address 0.0.0.0
+
+release:
+  trunk serve --address 0.0.0.0 --release
