@@ -79,7 +79,7 @@ fn TimezoneSelector(cx: Scope) -> impl IntoView {
 
     view! {cx,
         <span for="choose-timezone">"Timezone:"</span>
-        <select name="choose-timezone" id="choose-timezone" class="mx-2 p-1 pr-4 border-2 border-gray-200 rounded-md text-sm">
+        <select name="choose-timezone" id="choose-timezone" class="mx-2 p-1 pr-4 border-2 border-gray-200 rounded-md text-sm dark:bg-slate-800">
             <option value="UTC">"UTC (Default)"</option>
             {
                 timezones
