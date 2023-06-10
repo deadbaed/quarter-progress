@@ -1,0 +1,10 @@
+[package]
+name = "quarter-progress"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+leptos = "0.3.0"
+chrono = "0.4.26"
+chrono-tz = "0.8.2"
+itertools = "0.10.5"
