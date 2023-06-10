@@ -531,7 +531,7 @@ async function __wbg_init(input) {
     if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
-        input = new URL('quarter-progress-bb91fdf0293cd4dd_bg.wasm', import.meta.url);
+        input = new URL('quarter-progress-5becc9cde4206c5e_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
