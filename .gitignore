@@ -1,6 +1,9 @@
 /target
 /dist
 
+/node_modules
+/style
+
 .idea/
 .vscode/
 .DS_Store
