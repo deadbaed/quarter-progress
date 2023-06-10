@@ -1,5 +1,5 @@
 use crate::dates::CurrentQuarter;
-use chrono::Utc;
+use chrono::{Datelike, Utc};
 use leptos::*;
 
 mod dates;
@@ -21,7 +21,8 @@ fn QuarterProgress(
 
     // Get timestamp with selected timezone
     let timestamp_tz = move || timestamp().with_timezone(&timezone());
-    let timestamp_tz_str = move || timestamp_tz().to_rfc2822();
+    let date = move || timestamp_tz().format("%A %d %B").to_string();
+    let time = move || timestamp_tz().format("%T").to_string();
 
     // Get current quarter
     let current_quarter = move || {
@@ -29,24 +30,40 @@ fn QuarterProgress(
             // TODO: unwrap
             .unwrap()
     };
+    let current_quarter_name = move || current_quarter().name();
 
     // Completed percentage of quarter
-    let percentage = move || current_quarter().percentage_completed();
+    let percentage = move || format!("{:.6}%", current_quarter().percentage_completed());
+    let progress_bar_width =
+        move || format!("width: {:.1}%", current_quarter().percentage_completed());
 
     // Pretty display of quarter durations
     let quarter_elapsed = move || current_quarter().pretty_duration_since_start().to_string();
     let quarter_remaining = move || current_quarter().pretty_duration_left().to_string();
 
     view! { cx,
-        <div>{timestamp_tz_str}</div>
+        <div class="space-y-2">
+            <div class="text-4xl">{date}</div>
+            <div class="text-3xl tracking-wide">{time}</div>
+        </div>
 
-        <label for="file">"Quarter progress:"</label>
-        <progress id="file" max="100" value={percentage}>{percentage}"%"</progress>
-        <div>{percentage}"%"</div>
+        <div class="space-y-2">
+            <div class="text-2xl">{current_quarter_name}" "{timestamp_tz().year()}</div>
 
-        <div>"We are in "{current_quarter().name()}</div>
-        <div>"Current quarter started " {quarter_elapsed} " ago"</div>
-        <div>"Next quarter in "{quarter_remaining}</div>
+            <div>
+                <div class="w-full bg-gray-200">
+                    <div class="bg-blue-500 h-8" style={progress_bar_width}></div>
+                </div>
+            </div>
+
+            <div class="text-lg">{percentage}" completed"</div>
+        </div>
+
+        <div class="space-y-4 text-lg">
+            <div>{current_quarter_name}" started " {quarter_elapsed} " ago"</div>
+            <div>"Next quarter starts in "{quarter_remaining}</div>
+        </div>
+
     }
 }
 
@@ -61,8 +78,8 @@ fn TimezoneSelector(cx: Scope) -> impl IntoView {
         .map(|timezone| timezone.name());
 
     view! {cx,
-        <div for="choose-timezone">"Choose timezone"</div>
-        <select name="choose-timezone" id="choose-timezone">
+        <span for="choose-timezone">"Timezone:"</span>
+        <select name="choose-timezone" id="choose-timezone" class="mx-2 p-1 pr-4 border-2 border-gray-200 rounded-md text-sm">
             <option value="UTC">"UTC (Default)"</option>
             {
                 timezones
@@ -87,11 +104,34 @@ fn App(cx: Scope) -> impl IntoView {
     );
 
     view! { cx,
-        <TimezoneSelector on:change=move |ev| { set_timezone(event_target_value(&ev)); } />
-        <QuarterProgress timestamp timezone />
+        <div class="space-y-8">
+            <div>
+                <TimezoneSelector on:change=move |ev| { set_timezone(event_target_value(&ev)); } />
+            </div>
+
+            <div class="space-y-12">
+                <QuarterProgress timestamp timezone />
+            </div>
+        </div>
     }
 }
 
 fn main() {
-    mount_to_body(|cx| view! { cx,  <App/>  })
+    mount_to_body(|cx| {
+        view! { cx,
+            <div class="flex-grow">
+                <main class="container mx-auto px-4 py-8 max-w-3xl">
+                    <div class="text-xl mb-4">"Quarter Progress"</div>
+                    <App />
+                </main>
+            </div>
+
+            <footer class="container mx-auto px-4 py-8">
+                "Quarter Progress was made in Q2 2023 with ❤️ by "
+                <a class="underline" href="https://philippeloctaux.com">"Phil"</a>
+                " to learn "
+                <a class="underline" href="https://leptos.dev">"Leptos"</a>
+            </footer>
+        }
+    })
 }

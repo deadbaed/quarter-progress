@@ -157,6 +157,6 @@ impl CurrentQuarter {
     }
 
     pub fn name(&self) -> String {
-        format!("Q{} {}", self.quarter.number, self.timestamp.year())
+        format!("Q{}", self.quarter.number)
     }
 }
