@@ -5,8 +5,6 @@ use chrono_tz::Tz;
 use itertools::Itertools;
 use std::fmt::{Display, Formatter};
 
-pub use constants::QUARTERS;
-
 #[derive(Copy, Clone)]
 struct Date {
     month: u32,
@@ -129,7 +127,7 @@ pub struct CurrentQuarter {
 
 impl CurrentQuarter {
     pub fn new(timestamp: DateTime<Tz>) -> Option<Self> {
-        QUARTERS
+        constants::QUARTERS
             .iter()
             .map(|q| q.to_quarter(timestamp.year(), &timestamp.timezone()))
             .find(|quarter| quarter.is_timestamp_in_quarter(timestamp))

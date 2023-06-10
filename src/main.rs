@@ -1,5 +1,5 @@
-use crate::dates::{CurrentQuarter, QUARTERS};
-use chrono::{Datelike, Utc};
+use crate::dates::CurrentQuarter;
+use chrono::Utc;
 use leptos::*;
 
 mod dates;
@@ -25,7 +25,7 @@ fn QuarterProgress(
 
     // Get current quarter
     let current_quarter = move || {
-        CurrentQuarter::newnew(timestamp_tz())
+        CurrentQuarter::new(timestamp_tz())
             // TODO: unwrap
             .unwrap()
     };
