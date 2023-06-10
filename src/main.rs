@@ -127,10 +127,16 @@ fn main() {
             </div>
 
             <footer class="container mx-auto px-4 py-8">
-                "Quarter Progress was made in Q2 2023 with ❤️ by "
-                <a class="underline" href="https://philippeloctaux.com">"Phil"</a>
-                " to learn "
-                <a class="underline" href="https://leptos.dev">"Leptos"</a>
+                <div>
+                    "Quarter Progress was made in Q2 2023 with ❤️ by "
+                    <a class="underline" href="https://philippeloctaux.com">"phil"</a>
+                </div>
+                <div>
+                    "Project made to learn "
+                    <a class="underline" href="https://leptos.dev">"leptos"</a>
+                    ", see the "
+                    <a class="underline" href="https://github.com/x4m3/quarter-progress">"source code"</a>
+                </div>
             </footer>
         }
     })
