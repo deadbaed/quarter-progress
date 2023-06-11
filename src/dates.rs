@@ -2,7 +2,6 @@ mod constants;
 
 use chrono::{DateTime, Datelike, Duration, TimeZone};
 use chrono_tz::Tz;
-use itertools::Itertools;
 use std::fmt::{Display, Formatter};
 
 #[derive(Copy, Clone)]
@@ -89,34 +88,29 @@ impl From<Duration> for QuarterDuration {
 impl Display for QuarterDuration {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let weeks = match &self.weeks {
-            0 => None,
-            1 => Some("1 week".into()),
-            x => Some(format!("{x} weeks")),
+            1 => "1 week".into(),
+            x => format!("{x} weeks"),
         };
         let days = match &self.days {
-            0 => None,
-            1 => Some("1 day".into()),
-            x => Some(format!("{x} days")),
+            1 => "1 day".into(),
+            x => format!("{x} days"),
         };
         let hours = match &self.hours {
-            0 => None,
-            1 => Some("1 hour".into()),
-            x => Some(format!("{x} hours")),
+            1 => "1 hour".into(),
+            x => format!("{x} hours"),
         };
         let minutes = match &self.minutes {
-            0 => None,
-            1 => Some("1 minute".into()),
-            x => Some(format!("{x} minutes")),
+            1 => "1 minute".into(),
+            x => format!("{x} minutes"),
         };
         let seconds = match &self.seconds {
-            0 => None,
-            1 => Some("1 second".into()),
-            x => Some(format!("{x} seconds")),
+            1 => "1 second".into(),
+            x => format!("{x} seconds"),
         };
 
         let values = [weeks, days, hours, minutes, seconds];
 
-        write!(f, "{}", values.iter().flatten().join(", "))
+        write!(f, "{}", values.join(", "))
     }
 }
 
