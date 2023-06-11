@@ -7,6 +7,8 @@ edition = "2021"
 leptos = "0.3.0"
 chrono = "0.4.26"
 chrono-tz = "0.8.2"
+serde = "1.0.164"
+leptos-use = { version = "0.2.1", features = ["storage"] }
 
 [profile.release]
 opt-level = 'z'

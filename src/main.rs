@@ -1,6 +1,8 @@
 use crate::dates::CurrentQuarter;
 use chrono::{Datelike, Utc};
 use leptos::*;
+use leptos_use::storage::use_storage;
+use serde::{Deserialize, Serialize};
 
 mod dates;
 
@@ -69,32 +71,50 @@ fn QuarterProgress(
 
 /// Select a timezone
 #[component]
-fn TimezoneSelector(cx: Scope) -> impl IntoView {
-    // List possible timezones
+fn TimezoneSelector(
+    cx: Scope,
+    /// Currently selected timezone
+    #[prop(into)]
+    timezone: Signal<String>,
+) -> impl IntoView {
+    // Put UTC at the top
+    let timezones_utc = ["UTC"];
+
+    // List other possible timezones
     let timezones = chrono_tz::TZ_VARIANTS
         .into_iter()
         .filter(|tz| tz.name().contains('/'))
         .filter(|tz| !tz.name().starts_with("Etc"))
         .map(|timezone| timezone.name());
 
+    let all_options = 
+    // Combine all options together
+    timezones_utc
+        .into_iter()
+        .chain(timezones)
+        // Create their view
+        .map(|tz| {
+            // Add selected prop if value is currently selected
+            view! { cx, <option value={tz} prop:selected=move || &timezone() == {tz}>{tz}</option>}
+        })
+        .collect_view(cx);
+
     view! {cx,
         <span for="choose-timezone">"Timezone:"</span>
         <select name="choose-timezone" id="choose-timezone" class="mx-2 p-1 pr-4 border-2 border-gray-200 rounded-md text-sm dark:bg-slate-800">
-            <option value="UTC">"UTC (Default)"</option>
-            {
-                timezones
-                .map(|tz| view! { cx, <option value={tz}>{tz}</option>})
-                .collect_view(cx)
-            }
+            {all_options}
         </select>
     }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct Settings {
+    pub timezone: String,
 }
 
 #[component]
 fn App(cx: Scope) -> impl IntoView {
     let now = Utc::now;
-
-    let (timezone, set_timezone) = create_signal(cx, "UTC".to_string());
     let (timestamp, set_timestamp) = create_signal(cx, now());
 
     // Refresh time every second
@@ -103,10 +123,17 @@ fn App(cx: Scope) -> impl IntoView {
         std::time::Duration::from_secs(1),
     );
 
+    // Settings
+    let settings = Settings {
+        timezone: "UTC".into(),
+    };
+    let (settings, set_settings, _) = use_storage(cx, "settings", settings.clone());
+    let timezone = create_memo(cx, move |_| settings().timezone);
+
     view! { cx,
         <div class="space-y-8">
             <div>
-                <TimezoneSelector on:change=move |ev| { set_timezone(event_target_value(&ev)); } />
+                <TimezoneSelector timezone on:change=move |ev| { set_settings.update(|s| s.timezone = event_target_value(&ev)) } />
             </div>
 
             <div class="space-y-12">
