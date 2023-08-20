@@ -101,7 +101,7 @@ fn TimezoneSelector(
 
     view! {cx,
         <span for="choose-timezone">"Timezone:"</span>
-        <select name="choose-timezone" id="choose-timezone" class="mx-2 p-1 pr-4 border-2 border-gray-200 rounded-md text-sm dark:bg-slate-800">
+        <select name="choose-timezone" id="choose-timezone" class="appearance-none mx-2 p-1 pr-4 border-2 border-gray-200 rounded-md text-sm dark:bg-slate-800">
             {all_options}
         </select>
     }
