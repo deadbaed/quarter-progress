@@ -594,6 +594,12 @@ video {
   flex-grow: 1;
 }
 
+.appearance-none {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
 .flex-col {
   flex-direction: column;
 }
