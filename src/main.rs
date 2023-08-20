@@ -19,12 +19,12 @@ fn QuarterProgress(
 ) -> impl IntoView {
     // TODO: unwrap
     // Parse timezone
-    let timezone = move || timezone().parse::<chrono_tz::Tz>().unwrap();
+    let timezone = move || timezone.get().parse::<chrono_tz::Tz>().unwrap();
 
     // Get timestamp with selected timezone
-    let timestamp_tz = move || timestamp().with_timezone(&timezone());
+    let timestamp_tz = move || timestamp.get().with_timezone(&timezone());
     let date = move || timestamp_tz().format("%A %d %B").to_string();
-    let time = move || timestamp_tz().format("%T").to_string();
+    let time = move || timestamp_tz().format("%T %Z").to_string();
 
     // Get current quarter
     let current_quarter = move || {
@@ -50,7 +50,7 @@ fn QuarterProgress(
         </div>
 
         <div class="space-y-2">
-            <div class="text-2xl">{current_quarter_name}" "{timestamp_tz().year()}</div>
+            <div class="text-2xl">{current_quarter_name}" "{move || timestamp_tz().year()}</div>
 
             <div>
                 <div class="w-full bg-gray-200">
@@ -87,7 +87,7 @@ fn TimezoneSelector(
         .filter(|tz| !tz.name().starts_with("Etc"))
         .map(|timezone| timezone.name());
 
-    let all_options = 
+    let all_options =
     // Combine all options together
     timezones_utc
         .into_iter()
@@ -95,7 +95,7 @@ fn TimezoneSelector(
         // Create their view
         .map(|tz| {
             // Add selected prop if value is currently selected
-            view! { cx, <option value={tz} prop:selected=move || &timezone() == {tz}>{tz}</option>}
+            view! { cx, <option value=tz prop:selected=move || timezone.get() == {tz}>{tz}</option>}
         })
         .collect_view(cx);
 
@@ -119,7 +119,7 @@ fn App(cx: Scope) -> impl IntoView {
 
     // Refresh time every second
     set_interval(
-        move || set_timestamp(now()),
+        move || set_timestamp.set(now()),
         std::time::Duration::from_secs(1),
     );
 
@@ -128,7 +128,7 @@ fn App(cx: Scope) -> impl IntoView {
         timezone: "UTC".into(),
     };
     let (settings, set_settings, _) = use_storage(cx, "settings", settings.clone());
-    let timezone = create_memo(cx, move |_| settings().timezone);
+    let timezone = create_memo(cx, move |_| settings.get().timezone);
 
     view! { cx,
         <div class="space-y-8">

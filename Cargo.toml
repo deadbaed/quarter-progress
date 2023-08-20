@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-leptos = "0.3.0"
+leptos = { version = "0.4.8", features = ["csr"] }
 chrono = "0.4.26"
 chrono-tz = "0.8.2"
 serde = "1.0.164"
-leptos-use = { version = "0.2.1", features = ["storage"] }
+leptos-use = { version = "0.6.0", features = ["storage"] }
 
 [profile.release]
 opt-level = 'z'
