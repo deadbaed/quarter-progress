@@ -17,9 +17,13 @@ fn QuarterProgress(
     #[prop(into)]
     timezone: Signal<String>,
 ) -> impl IntoView {
-    // TODO: unwrap
-    // Parse timezone
-    let timezone = move || timezone.get().parse::<chrono_tz::Tz>().unwrap();
+    // Parse timezone, fallback to UTC
+    let timezone = move || {
+        timezone
+            .get()
+            .parse::<chrono_tz::Tz>()
+            .unwrap_or(chrono_tz::UTC)
+    };
 
     // Get timestamp with selected timezone
     let timestamp_tz = move || timestamp.get().with_timezone(&timezone());
