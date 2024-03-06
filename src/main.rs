@@ -93,7 +93,7 @@ fn TimezoneSelector() -> impl IntoView {
             .map(|tz| {
                 // Link with timezone as query
                 let encoded_timezone = url::form_urlencoded::byte_serialize(tz.as_bytes()).collect::<String>();
-                let uri = github_pages_route(format!("/?tz={}", encoded_timezone));
+                let uri = github_pages_route(format!("?tz={}", encoded_timezone));
                 view! { <p class="my-1"><Link uri=uri label=tz /></p> }
             })
             .collect_view();
@@ -113,9 +113,9 @@ fn github_pages_route<S: Into<String>>(url: S) -> String {
 }
 
 #[component]
-fn Link<S: Into<String>>(uri: S, label: &'static str) -> impl IntoView {
+fn Link(uri: String, label: &'static str) -> impl IntoView {
     view! {
-        <A class="rounded-lg px-3 py-2 font-medium hover:bg-slate-100 hover:text-slate-900" href=github_pages_route(uri)>{label}</A>
+        <A class="rounded-lg px-3 py-2 font-medium hover:bg-slate-100 hover:text-slate-900" href=uri>{label}</A>
     }
 }
 
