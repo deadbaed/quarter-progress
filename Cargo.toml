@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-leptos = { version = "0.4.8", features = ["csr"] }
-chrono = "0.4.26"
-chrono-tz = "0.8.2"
-serde = "1.0.164"
-leptos-use = { version = "0.6.0", features = ["storage"] }
+leptos = { version = "0.6", features = ["csr"] }
+leptos_router = { version = "0.6", features = ["csr"] }
+chrono = "0.4"
+chrono-tz = "0.8"
+url = "2.4.1"
 
 [profile.release]
 opt-level = 'z'

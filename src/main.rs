@@ -1,26 +1,25 @@
 use crate::dates::CurrentQuarter;
 use chrono::{Datelike, Utc};
 use leptos::*;
-use leptos_use::storage::use_storage;
-use serde::{Deserialize, Serialize};
+use leptos_router::*;
 
 mod dates;
 
 /// Display progress of a quarter
 #[component]
 fn QuarterProgress(
-    cx: Scope,
     /// UTC timestamp
     #[prop(into)]
     timestamp: Signal<chrono::DateTime<Utc>>,
-    /// Selected timezone
-    #[prop(into)]
-    timezone: Signal<String>,
 ) -> impl IntoView {
-    // Parse timezone, fallback to UTC
+    // Get query "tz" into a String
+    let query = use_query_map();
+
+    // Parse query to timezone, UTC if it does not exist or does not parse
     let timezone = move || {
-        timezone
-            .get()
+        query
+            .with(|query| query.get("tz").cloned())
+            .unwrap_or("UTC".into())
             .parse::<chrono_tz::Tz>()
             .unwrap_or(chrono_tz::UTC)
     };
@@ -47,7 +46,7 @@ fn QuarterProgress(
     let quarter_elapsed = move || current_quarter().pretty_duration_since_start().to_string();
     let quarter_remaining = move || current_quarter().pretty_duration_left().to_string();
 
-    view! { cx,
+    view! {
         <div class="space-y-2">
             <div class="text-4xl">{date}</div>
             <div class="text-3xl tracking-wide">{time}</div>
@@ -73,14 +72,8 @@ fn QuarterProgress(
     }
 }
 
-/// Select a timezone
 #[component]
-fn TimezoneSelector(
-    cx: Scope,
-    /// Currently selected timezone
-    #[prop(into)]
-    timezone: Signal<String>,
-) -> impl IntoView {
+fn TimezoneSelector() -> impl IntoView {
     // Put UTC at the top
     let timezones_utc = ["UTC"];
 
@@ -92,34 +85,44 @@ fn TimezoneSelector(
         .map(|timezone| timezone.name());
 
     let all_options =
-    // Combine all options together
-    timezones_utc
-        .into_iter()
-        .chain(timezones)
-        // Create their view
-        .map(|tz| {
-            // Add selected prop if value is currently selected
-            view! { cx, <option value=tz prop:selected=move || timezone.get() == {tz}>{tz}</option>}
-        })
-        .collect_view(cx);
+        // Combine all options together
+        timezones_utc
+            .into_iter()
+            .chain(timezones)
+            // Create their view
+            .map(|tz| {
+                // Link with timezone as query
+                let encoded_timezone = url::form_urlencoded::byte_serialize(tz.as_bytes()).collect::<String>();
+                let uri = github_pages_route(format!("/?tz={}", encoded_timezone));
+                view! { <p class="my-1"><Link uri=uri label=tz /></p> }
+            })
+            .collect_view();
 
-    view! {cx,
-        <span for="choose-timezone">"Timezone:"</span>
-        <select name="choose-timezone" id="choose-timezone" class="appearance-none mx-2 p-1 pr-4 border-2 border-gray-200 rounded-md text-sm dark:bg-slate-800">
-            {all_options}
-        </select>
+    view! {
+        <div class="text-3xl">"Select your timezone"</div>
+        <div>{all_options}</div>
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-struct Settings {
-    pub timezone: String,
+fn github_pages_route<S: Into<String>>(url: S) -> String {
+    if cfg!(debug_assertions) {
+        url.into()
+    } else {
+        format!("/quarter-progress{}", url.into())
+    }
 }
 
 #[component]
-fn App(cx: Scope) -> impl IntoView {
+fn Link<S: Into<String>>(uri: S, label: &'static str) -> impl IntoView {
+    view! {
+        <A class="rounded-lg px-3 py-2 font-medium hover:bg-slate-100 hover:text-slate-900" href=github_pages_route(uri)>{label}</A>
+    }
+}
+
+#[component]
+fn App() -> impl IntoView {
     let now = Utc::now;
-    let (timestamp, set_timestamp) = create_signal(cx, now());
+    let (timestamp, set_timestamp) = create_signal(now());
 
     // Refresh time every second
     set_interval(
@@ -127,32 +130,32 @@ fn App(cx: Scope) -> impl IntoView {
         std::time::Duration::from_secs(1),
     );
 
-    // Settings
-    let settings = Settings {
-        timezone: "UTC".into(),
-    };
-    let (settings, set_settings, _) = use_storage(cx, "settings", settings.clone());
-    let timezone = create_memo(cx, move |_| settings.get().timezone);
-
-    view! { cx,
-        <div class="space-y-8">
-            <div>
-                <TimezoneSelector timezone on:change=move |ev| { set_settings.update(|s| s.timezone = event_target_value(&ev)) } />
-            </div>
-
-            <div class="space-y-12">
-                <QuarterProgress timestamp timezone />
-            </div>
-        </div>
+    view! {
+        <Router>
+            <main>
+                <Routes>
+                    <Route path=github_pages_route("/") view=move || view! {
+                        <nav class="flex justify-center items-center space-x-4 mb-4">
+                            <Link uri=github_pages_route("/timezone") label="Change timezone" />
+                        </nav>
+                        <div class="space-y-12">
+                            <QuarterProgress timestamp=timestamp />
+                        </div>
+                    }/>
+                    <Route path=github_pages_route("/timezone") view=TimezoneSelector />
+                    <Route path=github_pages_route("/*any") view=move || view! { <div class="text-3xl">"404 Not found"</div> }/>
+                </Routes>
+            </main>
+        </Router>
     }
 }
 
 fn main() {
-    mount_to_body(|cx| {
-        view! { cx,
+    mount_to_body(|| {
+        view! {
             <div class="flex-grow">
                 <main class="container mx-auto px-4 py-8 max-w-3xl">
-                    <div class="text-xl mb-4">"Quarter Progress"</div>
+                    <div class="text-3xl mb-4">"Quarter Progress"</div>
                     <App />
                 </main>
             </div>
