@@ -24,6 +24,8 @@ fn QuarterProgress(
             .unwrap_or(chrono_tz::UTC)
     };
 
+    log::debug!("Using timezone {}", timezone());
+
     // Get timestamp with selected timezone
     let timestamp_tz = move || timestamp.get().with_timezone(&timezone());
     let date = move || timestamp_tz().format("%A %d %B").to_string();
@@ -134,7 +136,7 @@ fn App() -> impl IntoView {
         <Router>
             <main>
                 <Routes>
-                    <Route path=github_pages_route("/") view=move || view! {
+                    <Route path=github_pages_route("/*") view=move || view! {
                         <nav class="flex justify-center items-center space-x-4 mb-4">
                             <Link uri=github_pages_route("/timezone") label="Change timezone" />
                         </nav>
@@ -143,7 +145,6 @@ fn App() -> impl IntoView {
                         </div>
                     }/>
                     <Route path=github_pages_route("/timezone") view=TimezoneSelector />
-                    <Route path=github_pages_route("/*any") view=move || view! { <div class="text-3xl">"404 Not found"</div> }/>
                 </Routes>
             </main>
         </Router>
@@ -151,6 +152,10 @@ fn App() -> impl IntoView {
 }
 
 fn main() {
+    _ = console_log::init_with_level(log::Level::Debug);
+    console_error_panic_hook::set_once();
+    log::debug!("Base URL is: {}", github_pages_route("/"));
+
     mount_to_body(|| {
         view! {
             <div class="flex-grow">

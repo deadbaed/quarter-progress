@@ -9,6 +9,9 @@ leptos_router = { version = "0.6", features = ["csr"] }
 chrono = "0.4"
 chrono-tz = "0.8"
 url = "2.4.1"
+log = "0.4"
+console_log = "1"
+console_error_panic_hook = "0.1.7"
 
 [profile.release]
 opt-level = 'z'
